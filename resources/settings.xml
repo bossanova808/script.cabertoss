@@ -14,7 +14,7 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <control type="button" format="path">
-                        <heading>32026</heading>
+                        <heading>32001</heading>
                     </control>
                 </setting>
             </group>
