@@ -100,7 +100,7 @@ def copy_log_files(log_files: []):
                 with open(xbmcvfs.translatePath(file[1]), 'r', encoding='utf-8') as current:
                     content = current.read()
                     sanitised = clean_log(content)
-                with open(xbmcvfs.translatePath(os.path.join(now_destination_path,os.path.basename(file[1]))), 'w+', encoding='utf-8') as output:
+                with xbmcvfs.File(os.path.join(xbmcvfs.translatePath(now_destination_path),os.path.basename(file[1])), 'w') as output:
                     output.write(sanitised)
             else:
                 Logger.info(f'Copying {file[0]} {file[1]}')

@@ -7,6 +7,10 @@
                     <level>0</level>
                     <default/>
                     <constraints>
+                        <sources>
+                            <source>files</source>
+                        </sources>
+                        <writable>true</writable>
                         <allowempty>true</allowempty>
                     </constraints>
                     <control type="button" format="path">
