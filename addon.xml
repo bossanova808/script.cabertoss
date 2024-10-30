@@ -20,8 +20,8 @@ Even better, bind this to a remote button (use `Runscript(script.cabertoss)`) - 
         <license>GPL-3.0-only</license>
         <website>https://github.com/bossanova808/script.cabertoss</website>
         <source>https://github.com/bossanova808/script.cabertoss</source>
-        <forum />
-        <email />
+        <forum>https://forum.kodi.tv/showthread.php?tid=379304</forum>
+        <email>bossanova808@gmail.com</email>
         <news>v1.0.1
 - Improve compatibility with network shares            
 - Improve compatibility with Windows and *ELEC
