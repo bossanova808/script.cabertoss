@@ -69,8 +69,8 @@ def gather_log_files():
             item_with_path = os.path.join(crashlog_path, item)
             if filematch in item and os.path.isfile(item_with_path):
                 # Don't bother with older crashlogs
-                three_days_ago = datetime.now() - timedelta(days=3)
-                if three_days_ago < datetime.fromtimestamp(os.path.getmtime(item_with_path)):
+                x_days_ago = datetime.now() - timedelta(days=Store.crashlog_max_days)
+                if x_days_ago < datetime.fromtimestamp(os.path.getmtime(item_with_path)):
                     items.append(os.path.join(crashlog_path, item))
 
         items.sort(key=lambda f:os.path.getmtime(f))
