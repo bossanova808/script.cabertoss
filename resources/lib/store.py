@@ -13,8 +13,8 @@ class Store:
 
     # Static class variables, referred to elsewhere by Store.whatever
     # https://docs.python.org/3/faq/programming.html#how-do-i-create-static-class-data-and-static-class-methods
-    destination_path = None
-    crashlog_max_days = 3
+    destination_path: str = ''
+    crashlog_max_days: int = 3
 
     def __init__(self):
         """
@@ -35,5 +35,5 @@ class Store:
             Logger.info(f'Logs will be tossed to: {clean_log(Store.destination_path)}')
         else:
             Logger.warning('No path set to toss logs to.')
-        Store.crashlog_max_days = ADDON.getSetting('crashlog_max_days') or 3
+        Store.crashlog_max_days = int(ADDON.getSetting('crashlog_max_days')) or 3
         Logger.info(f'Crashlog max days: {Store.crashlog_max_days}')

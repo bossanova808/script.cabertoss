@@ -20,7 +20,7 @@ def _vfs_join(base: str, name: str) -> str:
     return os.path.join(base, name)
 
 
-def gather_log_files():
+def gather_log_files() -> List[Tuple[str, str]]:
     """
     Gather a list of the standard Kodi log files (Kodi.log, Kodi.old.log) and the latest crash log, if there is one.
 
@@ -29,7 +29,7 @@ def gather_log_files():
 
     # Basic log files
     log_files = [('log', os.path.join(LOG_PATH, 'kodi.log'))]
-    if os.path.exists(os.path.join(LOG_PATH, 'kodi.old.log')):
+    if xbmcvfs.exists(os.path.join(LOG_PATH, 'kodi.old.log')):
         log_files.append(('oldlog', os.path.join(LOG_PATH, 'kodi.old.log')))
 
     # Can we find a crashlog?
