@@ -24,8 +24,9 @@ class Store:
     @staticmethod
     def load_config_from_settings():
         """
-        Load in the addon settings, at start or reload them if they have been changed
-        Log each setting as it is loaded
+        Load the addon's logging configuration from persistent settings.
+        
+        Reads the 'log_path' setting and assigns it to Store.destination_path, then logs the resolved path (sanitized with clean_log). This is called at startup and when settings are reloaded; it has no return value.
         """
         Logger.info("Loading configuration from settings")
         Store.destination_path = ADDON.getSetting('log_path')
