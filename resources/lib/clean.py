@@ -11,5 +11,5 @@ def clean_log(content):
     replaces = (('//.+?:.+?@', '//USER:PASSWORD@'), ('<user>.+?</user>', '<user>USER</user>'), ('<pass>.+?</pass>', '<pass>PASSWORD</pass>'),)
 
     for pattern, repl in replaces:
-        sanitised = re.sub(pattern, repl, content)
-        return sanitised
+        content = re.sub(pattern, repl, content)
+    return content

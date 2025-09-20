@@ -4,6 +4,7 @@ from datetime import datetime
 from time import sleep
 from datetime import datetime, timedelta
 import socket
+from typing import List
 
 import xbmc
 import xbmcvfs
@@ -59,7 +60,6 @@ def gather_log_files():
         filematch = 'kodi_crashlog_'
 
     if crashlog_path and os.path.isdir(crashlog_path):
-        lastcrash = None
         dirs, possible_crashlog_files = xbmcvfs.listdir(crashlog_path)
         for item in possible_crashlog_files:
             item_with_path = os.path.join(crashlog_path, item)
@@ -88,17 +88,17 @@ def gather_log_files():
     return log_files
 
 
-def copy_log_files(log_files: []):
+def copy_log_files(log_files: List) -> bool:
     """
     Actually copy the log files to the path in the addon settings
 
-    @param log_files: [] list of log files to copy
-    @return: None
+    @param log_files: List list of log files to copy
+    @return bool: indicating success or failure
     """
     if not log_files:
         Logger.error(LANGUAGE(32025))
         Notify.error(LANGUAGE(32025))
-        return
+        return False
 
     now_folder_name = f"{socket.gethostname()}_Kodi_Logs_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
     now_destination_path = os.path.join(Store.destination_path, now_folder_name)
@@ -128,7 +128,7 @@ def copy_log_files(log_files: []):
 
 # This is 'main'...
 def run():
-    footprints()
+    Logger.start()
     Store.load_config_from_settings()
 
     if not Store.destination_path:
@@ -142,4 +142,4 @@ def run():
         else:
             Notify.info(LANGUAGE(32029))
     # and, we're done...
-    footprints(startup=False)
+    Logger.stop()
