@@ -13,7 +13,7 @@ from bossanova808.constants import LANGUAGE
 from bossanova808.logger import Logger
 from bossanova808.notify import Notify
 from resources.lib.store import Store
-from resources.lib.clean import *
+from resources.lib.clean import clean_log
 
 
 def gather_log_files():
@@ -24,9 +24,9 @@ def gather_log_files():
     """
 
     # Basic log files
-    log_files = [['log', os.path.join(LOG_PATH, 'kodi.log')]]
+    log_files = [('log', os.path.join(LOG_PATH, 'kodi.log'))]
     if os.path.exists(os.path.join(LOG_PATH, 'kodi.old.log')):
-        log_files.append(['oldlog', os.path.join(LOG_PATH, 'kodi.old.log')])
+        log_files.append(('oldlog', os.path.join(LOG_PATH, 'kodi.old.log')))
 
     # Can we find a crashlog?
     # @TODO - add Android support if possible..?
@@ -80,7 +80,7 @@ def gather_log_files():
         if lastcrash:
             # Logger.info(f"lastcrash {lastcrash}")
             for crashfile in lastcrash:
-                log_files.append(['crashlog', crashfile])
+                log_files.append(('crashlog', crashfile))
 
     Logger.info("Found these log files to copy (type, basename):")
     Logger.info([[t, os.path.basename(p)] for t, p in log_files])
@@ -114,7 +114,10 @@ def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
 
     try:
         Logger.info(f'Making destination folder: {now_destination_path}')
-        xbmcvfs.mkdir(now_destination_path)
+        if not xbmcvfs.mkdir(now_destination_path):
+            Logger.error(f'Failed to create destination folder: {now_destination_path}')
+            Notify.error(LANGUAGE(32031))
+            return False
         for file in log_files:
             if file[0] in ['log', 'oldlog']:
                 Logger.info(f'Copying sanitised {file[0]} {file[1]}')
@@ -122,8 +125,11 @@ def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
                     content = current.read()
                     sanitised = clean_log(content)
                 dest_path = os.path.join(xbmcvfs.translatePath(now_destination_path), os.path.basename(file[1]))
-                with xbmcvfs.File(dest_path, 'w') as output:
-                    output.write(sanitised.encode('utf-8'))
+                f = xbmcvfs.File(dest_path, 'w')
+                try:
+                    f.write(sanitised.encode('utf-8'))
+                finally:
+                    f.close()
             else:
                 Logger.info(f'Copying {file[0]} {file[1]}')
                 if not xbmcvfs.copy(file[1], os.path.join(now_destination_path, os.path.basename(file[1]))):
@@ -162,7 +168,7 @@ def run():
             if result:
                 Notify.info(LANGUAGE(32028) + f": {len(log_file_list)}")
             else:
-                Notify.info(LANGUAGE(32029))
+                Notify.error(LANGUAGE(32029))
     # and, we're done...
     finally:
         Logger.stop()
