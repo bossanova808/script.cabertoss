@@ -90,10 +90,19 @@ def gather_log_files():
 
 def copy_log_files(log_files: List) -> bool:
     """
-    Actually copy the log files to the path in the addon settings
+    Copy the provided Kodi log files into a timestamped destination folder under the configured addon destination.
 
-    @param log_files: List list of log files to copy
-    @return bool: indicating success or failure
+    Detailed behavior:
+    - Expects log_files as a list of 2-element entries [type, path], where `type` is e.g. 'log', 'oldlog', or 'crashlog' and `path` is the source filesystem path.
+    - Creates a destination directory at Store.destination_path named "<hostname>_Kodi_Logs_<YYYY-MM-DD_HH-MM-SS>".
+    - For entries with type 'log' or 'oldlog', reads the source, sanitizes the content with clean_log() (because these paths may be URLs with embedded user/password details), and writes the sanitized content to a file with the same basename in the destination folder.
+    - For other types (e.g., crash logs), copies the source file to the destination folder unchanged.
+
+    Parameters:
+        log_files (List): list of log descriptors [type, path] to copy.
+
+    Returns:
+        bool: True if files were successfully copied, False otherwise.
     """
     if not log_files:
         Logger.error(LANGUAGE(32025))
@@ -128,6 +137,17 @@ def copy_log_files(log_files: List) -> bool:
 
 # This is 'main'...
 def run():
+    """
+    Run the log collection and copying flow: initialize this addon's logging, load configuration, gather Kodi log files, copy them to the configured destination, notify the user, and stop this addon's logging.
+
+    This function performs the module's main orchestration. It:
+    - Starts the logger for this addon's internal logging (not Kodi's general logging system) and loads addon configuration from settings.
+    - If no destination path is configured, shows an error notification and skips copying.
+    - Otherwise, notifies the user, gathers available log files, attempts to copy them to the configured destination, and notifies success (including number of files copied) or failure.
+    - Stops this addon's internal logging before returning.
+
+    Side effects: starts/stops this addon's internal logging, reads configuration, performs filesystem operations (reading, sanitizing, and copying log files), and shows user notifications. Returns None.
+    """
     Logger.start()
     Store.load_config_from_settings()
 
