@@ -31,8 +31,3 @@ class Store:
         Store.destination_path = ADDON.getSetting('log_path')
 
         Logger.info(f'Logs will be tossed to: {clean_log(Store.destination_path)}')
-
-
-
-
-
