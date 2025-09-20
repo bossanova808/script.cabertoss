@@ -1,6 +1,6 @@
-from bossanova808.constants import *
+from bossanova808.constants import ADDON
 from bossanova808.logger import Logger
-from resources.lib.clean import *
+from resources.lib.clean import clean_log
 
 
 class Store:
