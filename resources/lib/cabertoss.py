@@ -24,7 +24,7 @@ def gather_log_files():
     """
     Gather a list of the standard Kodi log files (Kodi.log, Kodi.old.log) and the latest crash log, if there is one.
 
-    @return: list of log files in form [type, path], where type is log, oldlog, or crashlog
+    @return: list of log files as (type, path) tuples, where type is 'log', 'oldlog', or 'crashlog'
     """
 
     # Basic log files
@@ -68,11 +68,10 @@ def gather_log_files():
         for item in possible_crashlog_files:
             item_with_path = os.path.join(crashlog_path, item)
             if filematch in item and os.path.isfile(item_with_path):
-                if filematch in item:
-                    # Don't bother with older crashlogs
-                    three_days_ago = datetime.now() - timedelta(days=3)
-                    if three_days_ago < datetime.fromtimestamp(os.path.getmtime(item_with_path)):
-                        items.append(os.path.join(crashlog_path, item))
+                # Don't bother with older crashlogs
+                three_days_ago = datetime.now() - timedelta(days=3)
+                if three_days_ago < datetime.fromtimestamp(os.path.getmtime(item_with_path)):
+                    items.append(os.path.join(crashlog_path, item))
 
         items.sort(key=lambda f:os.path.getmtime(f))
         # Windows crashlogs are a dmp and stacktrace combo...
@@ -97,9 +96,9 @@ def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
     Copy the provided Kodi log files into a timestamped destination folder under the configured addon destination.
 
     Detailed behavior:
-    - Expects log_files as a list of 2-element entries [type, path], where `type` is e.g. 'log', 'oldlog', or 'crashlog' and `path` is the source filesystem path.
+    - Expects log_files as List[Tuple[str, str]] where `type` is e.g. 'log', 'oldlog', or 'crashlog' and `path` is the source filesystem path.
     - Creates a destination directory at Store.destination_path named "<hostname>_Kodi_Logs_<YYYY-MM-DD_HH-MM-SS>".
-    - For entries with type 'log' or 'oldlog', reads the source, sanitizes the content with clean_log() (because these paths may be URLs with embedded user/password details), and writes the sanitized content to a file with the same basename in the destination folder.
+    - For entries with type 'log' or 'oldlog', reads the source, sanitises the content with clean_log() (because the log content may contain URLs with embedded user/password details), and writes the sanitised content to a file with the same basename in the destination folder.
     - For other types (e.g., crash logs), copies the source file to the destination folder unchanged.
 
     Parameters:
@@ -114,7 +113,7 @@ def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
         return False
 
     now_folder_name = f"{socket.gethostname()}_Kodi_Logs_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-    now_destination_path = os.path.join(Store.destination_path, now_folder_name)
+    now_destination_path = _vfs_join(Store.destination_path, now_folder_name)
 
     try:
         Logger.info(f'Making destination folder: {now_destination_path}')

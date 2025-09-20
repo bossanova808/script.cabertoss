@@ -33,4 +33,4 @@ class Store:
         if Store.destination_path:
             Logger.info(f'Logs will be tossed to: {clean_log(Store.destination_path)}')
         else:
-            Logger.warning(f'No path set to toss logs to.')
+            Logger.warning('No path set to toss logs to.')
