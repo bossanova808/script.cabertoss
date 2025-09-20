@@ -29,6 +29,8 @@ class Store:
         Reads the 'log_path' setting and assigns it to Store.destination_path, then logs the resolved path (sanitized with clean_log because these paths may be URLs with embedded user/password details). This is called at startup and when settings are reloaded; it has no return value.
         """
         Logger.info("Loading configuration from settings")
-        Store.destination_path = ADDON.getSetting('log_path')
-
-        Logger.info(f'Logs will be tossed to: {clean_log(Store.destination_path)}')
+        Store.destination_path = ADDON.get_setting('log_path')
+        if Store.destination_path:
+            Logger.info(f'Logs will be tossed to: {clean_log(Store.destination_path)}')
+        else:
+            Logger.warning(f'No path set to toss logs to.')

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from datetime import datetime
-from time import sleep
 from datetime import datetime, timedelta
 import socket
 from typing import List, Tuple
@@ -14,6 +12,12 @@ from bossanova808.logger import Logger
 from bossanova808.notify import Notify
 from resources.lib.store import Store
 from resources.lib.clean import clean_log
+
+
+def _vfs_join(base: str, name: str) -> str:
+    if base.startswith(('special://', 'smb://', 'nfs://', 'ftp://', 'http://', 'https://')):
+        return base.rstrip('/') + '/' + name
+    return os.path.join(base, name)
 
 
 def gather_log_files():
@@ -51,7 +55,7 @@ def gather_log_files():
         filematch = 'kodi_'
     elif xbmc.getCondVisibility('system.platform.android'):
         Logger.info("System is Android")
-        Logger.info(LANGUAGE(32023))
+        Logger.info(LANGUAGE(32024))
 
     # If *ELEC, we can be more specific
     if xbmc.getCondVisibility('System.HasAddon(service.coreelec.settings)') or xbmc.getCondVisibility('System.HasAddon(service.libreelec.settings)'):
@@ -70,7 +74,7 @@ def gather_log_files():
                     if three_days_ago < datetime.fromtimestamp(os.path.getmtime(item_with_path)):
                         items.append(os.path.join(crashlog_path, item))
 
-        items.sort(key=lambda f: os.path.getmtime(f))
+        items.sort(key=lambda f:os.path.getmtime(f))
         # Windows crashlogs are a dmp and stacktrace combo...
         if xbmc.getCondVisibility('system.platform.windows'):
             lastcrash = items[-2:]
@@ -114,7 +118,7 @@ def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
 
     try:
         Logger.info(f'Making destination folder: {now_destination_path}')
-        if not xbmcvfs.mkdir(now_destination_path):
+        if not xbmcvfs.mkdirs(now_destination_path):
             Logger.error(f'Failed to create destination folder: {now_destination_path}')
             Notify.error(LANGUAGE(32031))
             return False
@@ -124,7 +128,7 @@ def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
                 with open(xbmcvfs.translatePath(file[1]), 'r', encoding='utf-8', errors='replace') as current:
                     content = current.read()
                     sanitised = clean_log(content)
-                dest_path = os.path.join(xbmcvfs.translatePath(now_destination_path), os.path.basename(file[1]))
+                dest_path = _vfs_join(now_destination_path, os.path.basename(file[1]))
                 f = xbmcvfs.File(dest_path, 'w')
                 try:
                     f.write(sanitised.encode('utf-8'))
@@ -132,7 +136,7 @@ def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
                     f.close()
             else:
                 Logger.info(f'Copying {file[0]} {file[1]}')
-                if not xbmcvfs.copy(file[1], os.path.join(now_destination_path, os.path.basename(file[1]))):
+                if not xbmcvfs.copy(file[1], _vfs_join(now_destination_path, os.path.basename(file[1]))):
                     return False
         return True
 
