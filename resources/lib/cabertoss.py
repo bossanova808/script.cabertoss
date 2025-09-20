@@ -4,12 +4,12 @@ from datetime import datetime
 from time import sleep
 from datetime import datetime, timedelta
 import socket
-from typing import List
+from typing import List, Tuple
 
 import xbmc
 import xbmcvfs
-from bossanova808.constants import *
-from bossanova808.utilities import *
+from bossanova808.constants import LOG_PATH
+from bossanova808.constants import LANGUAGE
 from bossanova808.logger import Logger
 from bossanova808.notify import Notify
 from resources.lib.store import Store
@@ -82,13 +82,13 @@ def gather_log_files():
             for crashfile in lastcrash:
                 log_files.append(['crashlog', crashfile])
 
-    Logger.info("Found these log files to copy:")
-    Logger.info(log_files)
+    Logger.info("Found these log files to copy (type, basename):")
+    Logger.info([[t, os.path.basename(p)] for t, p in log_files])
 
     return log_files
 
 
-def copy_log_files(log_files: List) -> bool:
+def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
     """
     Copy the provided Kodi log files into a timestamped destination folder under the configured addon destination.
 
@@ -99,7 +99,7 @@ def copy_log_files(log_files: List) -> bool:
     - For other types (e.g., crash logs), copies the source file to the destination folder unchanged.
 
     Parameters:
-        log_files (List): list of log descriptors [type, path] to copy.
+        log_files (List[Tuple[str, str]]): list of log descriptors [type, path] to copy.
 
     Returns:
         bool: True if files were successfully copied, False otherwise.
@@ -118,11 +118,12 @@ def copy_log_files(log_files: List) -> bool:
         for file in log_files:
             if file[0] in ['log', 'oldlog']:
                 Logger.info(f'Copying sanitised {file[0]} {file[1]}')
-                with open(xbmcvfs.translatePath(file[1]), 'r', encoding='utf-8') as current:
+                with open(xbmcvfs.translatePath(file[1]), 'r', encoding='utf-8', errors='replace') as current:
                     content = current.read()
                     sanitised = clean_log(content)
-                with xbmcvfs.File(os.path.join(xbmcvfs.translatePath(now_destination_path),os.path.basename(file[1])), 'w') as output:
-                    output.write(sanitised)
+                dest_path = os.path.join(xbmcvfs.translatePath(now_destination_path), os.path.basename(file[1]))
+                with xbmcvfs.File(dest_path, 'w') as output:
+                    output.write(sanitised.encode('utf-8'))
             else:
                 Logger.info(f'Copying {file[0]} {file[1]}')
                 if not xbmcvfs.copy(file[1], os.path.join(now_destination_path, os.path.basename(file[1]))):
@@ -149,17 +150,19 @@ def run():
     Side effects: starts/stops this addon's internal logging, reads configuration, performs filesystem operations (reading, sanitizing, and copying log files), and shows user notifications. Returns None.
     """
     Logger.start()
-    Store.load_config_from_settings()
+    try:
+        Store.load_config_from_settings()
 
-    if not Store.destination_path:
-        Notify.error(LANGUAGE(32027))
-    else:
-        Notify.info(LANGUAGE(32030))
-        log_file_list = gather_log_files()
-        result = copy_log_files(log_file_list)
-        if result:
-            Notify.info(LANGUAGE(32028) + f": {len(log_file_list)}")
+        if not Store.destination_path:
+            Notify.error(LANGUAGE(32027))
         else:
-            Notify.info(LANGUAGE(32029))
+            Notify.info(LANGUAGE(32030))
+            log_file_list = gather_log_files()
+            result = copy_log_files(log_file_list)
+            if result:
+                Notify.info(LANGUAGE(32028) + f": {len(log_file_list)}")
+            else:
+                Notify.info(LANGUAGE(32029))
     # and, we're done...
-    Logger.stop()
+    finally:
+        Logger.stop()
