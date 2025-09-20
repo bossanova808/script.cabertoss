@@ -58,5 +58,5 @@ msgid "Error making directory to copy log files to!"
 msgstr ""
 
 msgctxt "#32032"
-msgid "Maximum days age of crashlogs to consider for copy"
+msgid "Max age of crashlogs to copy (days)"
 msgstr ""

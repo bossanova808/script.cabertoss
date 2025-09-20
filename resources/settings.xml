@@ -17,11 +17,11 @@
                         <heading>32001</heading>
                     </control>
                 </setting>
-                <setting id="crashlog_max_days" type="integer" label="32005" help="">
+                <setting id="crashlog_max_days" type="integer" label="32032" help="">
                     <level>0</level>
                     <default>3</default>
                     <control type="edit" format="integer">
-                        <heading>32005</heading>
+                        <heading>32032</heading>
                     </control>
                 </setting>
             </group>
