@@ -9,12 +9,20 @@
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Provides an easy way to save Kodi log files, at a particular moment, to a chosen destination.</summary>
+        <summary lang="sv_SE">Tillhandahåller ett enkelt sätt att spara Kodi-loggfiler, vid ett visst ögonblick, till en vald destination.</summary>
         <description lang="en_GB">
 A script to quickly toss your Kodi logs from your Kodi client machine to somewhere more handy, for easier review.
 
 When something unexpected or bad happens, just run this add-on to copy the latest Kodi logs to your chosen destination.
 
 Even better, bind this to a remote button (use `Runscript(script.cabertoss)`) - so you can carry on with your relaxing at the time, and deal with the issue later (without having to wade through all the stuff you did after the issue happened!).
+        </description>
+        <description lang="sv_SE">
+Ett skript för att snabbt flytta dina Kodi-loggar från din Kodi-klientdator till en mer praktisk plats, för enklare granskning.
+
+När något oväntat eller dåligt händer, kör bara detta tillägg för att kopiera de senaste Kodi-loggarna till din valda destination.
+
+Ännu bättre, koppla detta till en fjärrkontrollsknapp (använd `Runscript(script.cabertoss)`) – så att du kan fortsätta att koppla av just då och ta itu med problemet senare (utan att behöva gå igenom allt du gjorde efter att problemet uppstod!).
         </description>
         <platform>all</platform>
         <license>GPL-3.0-only</license>
