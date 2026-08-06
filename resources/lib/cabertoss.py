@@ -116,8 +116,18 @@ def copy_log_files(log_files: List[Tuple[str, str]]) -> bool:
     now_destination_path = _vfs_join(Store.destination_path, now_folder_name)
 
     try:
+        # Kodi's native mkdirs() logs a spurious ERROR if any parent folder in the path already
+        # exists (e.g. Store.destination_path, reused across every run), even though it still
+        # succeeds overall. Avoid that by only recursively creating the parent if it's not there
+        # yet, then creating just the new (always-unique, timestamped) leaf folder.
+        if not xbmcvfs.exists(Store.destination_path):
+            if not xbmcvfs.mkdirs(Store.destination_path):
+                Logger.error(f'Failed to create destination path: {Store.destination_path}')
+                Notify.error(LANGUAGE(32031))
+                return False
+
         Logger.info(f'Making destination folder: {now_destination_path}')
-        if not xbmcvfs.mkdirs(now_destination_path):
+        if not xbmcvfs.mkdir(now_destination_path):
             Logger.error(f'Failed to create destination folder: {now_destination_path}')
             Notify.error(LANGUAGE(32031))
             return False

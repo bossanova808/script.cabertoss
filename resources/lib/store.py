@@ -1,5 +1,5 @@
-from bossanova808.constants import ADDON
 from bossanova808.logger import Logger
+from bossanova808.utilities import get_setting
 from resources.lib.clean import clean_log
 
 
@@ -30,10 +30,10 @@ class Store:
         Reads the 'log_path' setting and assigns it to Store.destination_path, then logs the resolved path (sanitized with clean_log because these paths may be URLs with embedded user/password details). This is called at startup and when settings are reloaded; it has no return value.
         """
         Logger.info("Loading configuration from settings")
-        Store.destination_path = ADDON.getSetting('log_path') or ''
+        Store.destination_path = get_setting('log_path') or ''
         if Store.destination_path:
             Logger.info(f'Logs will be tossed to: {clean_log(Store.destination_path)}')
         else:
             Logger.warning('No path set to toss logs to.')
-        Store.crashlog_max_days = int(ADDON.getSetting('crashlog_max_days')) or 3
+        Store.crashlog_max_days = int(get_setting('crashlog_max_days') or 3)
         Logger.info(f'Crashlog max days: {Store.crashlog_max_days}')
